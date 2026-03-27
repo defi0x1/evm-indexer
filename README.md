@@ -1,6 +1,14 @@
-# Indexing Risechain service
+# Risechain indexer
 
 A POC high-performance Rise blockchain data streaming and indexing platform built for Rise chain.
+
+## Features
+-   Real-time + Backfill: WebSocket subscription + historical
+    indexing
+-   Caching Layer: Redis-based smart cache resolver
+-   Lightweight Storage: SQLite for fast local querying and Web-UI support
+-   RPC Proxy: JSON-RPC handler with caching support
+-   Dockerized: Easy local setup with Docker Compose
 
 ## Architecture
 
@@ -12,14 +20,35 @@ A POC high-performance Rise blockchain data streaming and indexing platform buil
 
 ![Request flow](./images/rise_request.svg)
 
-## Quick start
+# 📁 Project Structure
 
-### Prerequisites
+    rise-indexer/
+    ├── database/              # SQLite service & storage
+    ├── fetcher/               # Indexing logic
+    │   ├── sherds_sub.rs      # Real-time WebSocket subscription
+    │   └── backfill.rs        # Historical data indexing
+    ├── redis/                 # Redis caching layer
+    ├── rpc_service/           # JSON-RPC handler service
+    │   |-- helper.rs          # Hepler handling transaction data
+    |   |-- reqwest_builder.rs # RPC reqwest builder
+    |── cache_resolver.rs      # Resolve redis cache logic
+    │── config.rs              # Configuration 
+    │── constants.rs           # Constant values
+    │── main.rs                # Application entry point
+    ├── docker-compose.yml     # Docker services definition
+    └── .env.example           # Environment configuration example
+
+## ⚙️ Prerequisites
+
+-   Rust 1.80+
+-   Docker & Docker Compose
+
+## Quick start
 
 ### 1. Configure environment
 
 ```bash
-touch .env
+cp .env.example .env
 ```
 
 Setup env
@@ -36,7 +65,7 @@ RUST_LOG=rise_indexer=info
 ### 2. Start indexer
 
 ```bash
-docker compose build -d
+docker compose up build -d
 ```
 
 Services:
