@@ -1,0 +1,58 @@
+name: rise-indexer
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  indexer:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8545:8545"
+    env_file: .env
+    environment:
+      SERVER_ADDR: 0.0.0.0:8545
+      DB_PATH: /data/database.db
+      REDIS_URL: redis://redis:6379
+      RUST_LOG: rise_indexer=info
+    volumes:
+      - sqlite-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  database:
+    image: coleifer/sqlite-web
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - sqlite-data:/data
+    environment:
+      SQLITE_DATABASE: /data/database.db
+    entrypoint:
+      [
+        "sqlite_web",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5432",
+        "--no-browser",
+        "/data/database.db",
+      ]
+    depends_on:
+      - indexer
+
+volumes:
+  redis-data:
+  sqlite-data:
