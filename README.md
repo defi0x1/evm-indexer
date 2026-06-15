@@ -1,6 +1,6 @@
-# Risechain indexer
+# EVM indexer
 
-A POC high-performance Rise blockchain data streaming and indexing platform built for Rise chain.
+A POC high-performance Evm blockchain data streaming and indexing platform built for Rise chain.
 
 ## Features
 -   Real-time + Backfill: WebSocket subscription + historical
